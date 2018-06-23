@@ -66,7 +66,6 @@ public class DetailsActivity extends AppCompatActivity {
 
     private String movieId, movieName;
     private MovieResource movieData;
-    private Bundle bundle;
 
     private void initViews() {
         setContentView(R.layout.activity_details);
@@ -78,7 +77,7 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (getIntent() != null) {
             Intent intent = getIntent();
-            bundle = intent.getExtras();
+            Bundle bundle = intent.getExtras();
             movieId = bundle.getString(MovieConstants.MOVIE_ID);
             movieName = bundle.getString(MovieConstants.MOVIE_NAME);
         }
@@ -137,13 +136,12 @@ public class DetailsActivity extends AppCompatActivity {
                 try {
                     JSONObject movieDetails = new JSONObject(response);
 
-                    MovieResource listItemProgramList = new MovieResource(movieDetails.getString("backdrop_path"),
+                    movieData = new MovieResource(movieDetails.getString("backdrop_path"),
                             movieDetails.getString("poster_path"),
                             movieDetails.getString("original_title"),
                             movieDetails.getString("vote_average"),
                             movieDetails.getString("release_date"),
                             movieDetails.getString("overview"));
-                    movieData = listItemProgramList;
 
                     setMovieDetails();
 

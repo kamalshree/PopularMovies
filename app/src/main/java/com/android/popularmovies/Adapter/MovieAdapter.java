@@ -2,33 +2,21 @@ package com.android.popularmovies.Adapter;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.popularmovies.Activity.DetailsActivity;
 import com.android.popularmovies.Model.MovieResource;
 import com.android.popularmovies.Presenter.PresenterCall;
 import com.android.popularmovies.R;
 import com.android.popularmovies.Utils.MovieConstants;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.BindView;
 
 /**
  * Created by kamalshree on 6/11/2018.
@@ -37,16 +25,16 @@ import butterknife.BindView;
 public class MovieAdapter extends ArrayAdapter<MovieResource> {
 
 
-    List<MovieResource> movieResources;
+    private final List<MovieResource> movieResources;
     //activity context
     private final Context context;
 
-    ImageView imageView;
+    private ImageView imageView;
 
 
     //the layout resource file for the list items
-    int resource;
-    private PresenterCall mPresenter;
+    private final int resource;
+    private final PresenterCall mPresenter;
 
 
     //constructor initializing the values
@@ -73,7 +61,7 @@ public class MovieAdapter extends ArrayAdapter<MovieResource> {
         final MovieResource movie = movieResources.get(position);
 
         //getting the view elements of the list from the view
-        imageView = (ImageView) view.findViewById(R.id.tv_imagepath);
+        imageView = view.findViewById(R.id.tv_imagepath);
         Picasso.get()
                 .load((MovieConstants.CARD_IMAGE_VIEW + movie.getPoster_Url()).trim())
                 .into(imageView);
