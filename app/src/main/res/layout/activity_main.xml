@@ -14,7 +14,7 @@
         android:layout_height="fill_parent"
         android:columnWidth="@dimen/gridview_columnwidth"
         android:gravity="center"
-        android:numColumns="2"
+        android:numColumns="@string/grid_col_number"
         android:verticalSpacing="@dimen/grid_verticalspacing"
         android:horizontalSpacing="@dimen/grid_horizontalspacing"
         app:layout_constraintBottom_toBottomOf="parent"
