@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -37,7 +39,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements PresenterCall {
+public class MainActivity extends AppCompatActivity implements PresenterCall,View.OnClickListener {
 
     private GridView gridView;
     private ProgressBar progressBar;
@@ -45,22 +47,31 @@ public class MainActivity extends AppCompatActivity implements PresenterCall {
     private PresenterCall myPresenter;
     private ArrayList<MovieResource> movieList;
     private MovieAdapter movieAdapter;
+    private LinearLayout no_connection;
+    private Button refresh_con;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+        gridView=findViewById(R.id.gv_movie_gridview);
+        progressBar=findViewById(R.id.pb_progressBar);
+        no_connection=findViewById(R.id.layout_noconnection);
+        refresh_con=findViewById(R.id.refresh);
+
+        refresh_con.setOnClickListener(this);
         myPresenter =  this;
         movieList = new ArrayList<>();
 
         if (!NetworkUtils.connectionStatus(this)) {
+            ShowNoInternetMessage();
             buildDialog(this).show();
-        } else {
-            setContentView(R.layout.activity_main);
-            getPostersDetails(MovieConstants.POPULAR_MOVIE_URL);
-            gridView=findViewById(R.id.gv_movie_gridview);
-            progressBar=findViewById(R.id.pb_progressBar);
         }
-
+        else{
+            getPostersDetails(MovieConstants.POPULAR_MOVIE_URL);
+            ShowMovieContent();
+        }
     }
 
     /*Display Movie Posters */
@@ -118,12 +129,18 @@ public class MainActivity extends AppCompatActivity implements PresenterCall {
         int id = item.getItemId();
         movieList = new ArrayList<>();
         movieAdapter = null;
-        if (id == R.id.popular_movies) {
-            getPostersDetails(MovieConstants.POPULAR_MOVIE_URL);
-            progressBar.setVisibility(View.GONE);
-        } else if (id == R.id.top_rates_movies) {
-            getPostersDetails(MovieConstants.TOP_RATED_MOVIE_URL);
-            progressBar.setVisibility(View.GONE);
+        if (NetworkUtils.connectionStatus(this)) {
+            ShowMovieContent();
+            if (id == R.id.popular_movies) {
+                getPostersDetails(MovieConstants.POPULAR_MOVIE_URL);
+                progressBar.setVisibility(View.GONE);
+            } else if (id == R.id.top_rates_movies) {
+                getPostersDetails(MovieConstants.TOP_RATED_MOVIE_URL);
+                progressBar.setVisibility(View.GONE);
+            }
+        }
+        else{
+            ShowNoInternetMessage();
         }
         return true;
     }
@@ -141,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements PresenterCall {
             public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
+
         });
 
         return builder;
@@ -149,13 +167,44 @@ public class MainActivity extends AppCompatActivity implements PresenterCall {
     /* Movie Detail Screen Intent */
     @Override
     public void DetailsScreen(String movieID, String movieTitle) {
-        Intent intent = new Intent(getApplicationContext(), DetailsActivity.class);
-        Bundle bundle = new Bundle();
-        intent.putExtra(MovieConstants.MOVIE_ID, movieID);
-        intent.putExtra(MovieConstants.MOVIE_NAME, movieTitle);
-        intent.putExtras(bundle);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
+        if (NetworkUtils.connectionStatus(this)) {
+            Intent intent = new Intent(getApplicationContext(), DetailsActivity.class);
+            Bundle bundle = new Bundle();
+            intent.putExtra(MovieConstants.MOVIE_ID, movieID);
+            intent.putExtra(MovieConstants.MOVIE_NAME, movieTitle);
+            intent.putExtras(bundle);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+        }
+        else{
+            ShowNoInternetMessage();
+        }
     }
 
+
+    @Override
+    public void onClick(View view) {
+        if (NetworkUtils.connectionStatus(this)) {
+            ShowMovieContent();
+            getPostersDetails(MovieConstants.POPULAR_MOVIE_URL);
+        }
+        else{
+            ShowNoInternetMessage();
+        }
+    }
+
+    /* Action when Internet available */
+    private void ShowMovieContent() {
+        gridView.setVisibility(View.VISIBLE);
+        no_connection.setVisibility(View.GONE);
+        refresh_con.setVisibility(View.GONE);
+    }
+
+    /*Action when internet not available */
+    private void ShowNoInternetMessage() {
+        gridView.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
+        no_connection.setVisibility(View.VISIBLE);
+        refresh_con.setVisibility(View.VISIBLE);
+    }
 }
